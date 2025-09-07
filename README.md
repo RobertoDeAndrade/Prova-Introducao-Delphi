@@ -2,7 +2,9 @@
 Prova do módulo de introdução ao Delphi do curso Tech4me.  
 
 Projeto Delphi – Windows VCL: Calculadora de Média Escolar  
+
 Crie um aplicativo VCL que receba três notas, calcule a média aritmética ao clicar em um botão e exiba a situação do aluno: Aprovado, Recuperação ou Reprovado.  
+
 Critérios de avaliação por média
 Média ≥ 7,0: Aprovado  
 Média entre 5,0 e 6,9: Recuperação  
