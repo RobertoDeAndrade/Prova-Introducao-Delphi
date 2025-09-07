@@ -1,0 +1,138 @@
+unit TelaPrincipal;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+
+type
+  TForm1 = class(TForm)
+    edtValor1: TEdit;
+    edtValor2: TEdit;
+    edtValor3: TEdit;
+    lblTitulo: TLabel;
+    btnCalcular: TButton;
+    lblNota1: TLabel;
+    lblNota2: TLabel;
+    lblNota3: TLabel;
+    lblMedia: TLabel;
+    lblMediaFinal: TLabel;
+    lblResultadoFinal: TLabel;
+    lblResultado: TLabel;
+    procedure btnCalcularClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure Calcular(media : double);
+    function ValidarNumero(var nota1, nota2, nota3: double): boolean;
+    function CalcularMedia(n1, n2, n3: double): double;
+    procedure LabelFinalInvisivel;
+    procedure LabelFinalVisivel;
+    var nota1 : double;
+    var nota2 : double;
+    var nota3 : double;
+    var media : double;
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.dfm}
+
+function TForm1.ValidarNumero(var nota1, nota2, nota3: double) : boolean;
+begin
+  Result := false;  // Começa como false para não calcular a média se houver erros
+
+  if not TryStrToFloat(edtValor1.Text, nota1) or (nota1 < 0) or (nota1 > 10) then  // Aqui valida se é um número e se é entre 0 e 10
+    begin
+      LabelFinalInvisivel; // Manter as label de média e resultado invisíveis até o cálculo ser válido
+      edtValor1.Clear;
+      ShowMessage('Nota 1 inválida! Digite novamente!');
+      edtValor1.SetFocus; // Retorna ao campo onde ocorreu o erro
+      Exit;  // Interrompe a execução da function para não calcular a média
+    end;
+
+  if not TryStrToFloat(edtValor2.Text, nota2) or (nota2 < 0) or (nota2 > 10) then
+    begin
+      LabelFinalInvisivel; // Manter as label de média e resultado invisíveis até o cálculo ser válido
+      edtValor2.Clear;
+      ShowMessage('Nota 2 inválida! Digite novamente!');
+      edtValor2.SetFocus;
+      Exit;
+    end;
+
+  if not TryStrToFloat(edtValor3.Text, nota3) or (nota3 < 0) or (nota3 > 10) then
+    begin
+      LabelFinalInvisivel; // Manter as label de média e resultado invisíveis até o cálculo ser válido
+      edtValor3.Clear;
+      ShowMessage('Nota 3 inválida! Digite novamente!');
+      edtValor3.SetFocus;
+      Exit;
+    end
+  else
+    Result := true;  // Quando chegar nesse ponto, todas as validações acima estarão corretas
+                     // e retornará true para prosseguir com o cálculo
+end;
+
+function TForm1.CalcularMedia(n1, n2, n3 : double) : double;
+begin
+  media := (n1 + n2 + n3) / 3;
+  // O Trunc corta a casa decimal da (média * 100) e depois volta com a casa decimal ao / a média por 100.
+  media := Trunc(media * 100) / 100;  // Desse modo, evita que a média de 9,996 seja arredondado para 10, por exemplo.
+  result := media;
+end;
+
+procedure TForm1.Calcular(media : double);
+begin
+  if (media >= 7) then
+    begin
+      lblResultadoFinal.Font.Color := clGreen;
+      lblResultadoFinal.Caption := 'Aprovado!'
+    end
+  else if (media >= 5) and (media < 7) then
+    begin
+      lblResultadoFinal.Font.Color := clWebYellow;
+      lblResultadoFinal.Caption := 'Recuperação!';
+    end
+  else
+    begin
+      lblResultadoFinal.Font.Color := clRed;
+      lblResultadoFinal.Caption := 'Reprovado!';
+    end;
+end;
+
+procedure TForm1.LabelFinalInvisivel;
+begin
+  lblMedia.Visible := false;
+  lblMediaFinal.Visible := false;
+  lblResultado.Visible := false;
+  lblResultadoFinal.Visible := false;
+end;
+
+procedure TForm1.LabelFinalVisivel;
+begin
+  lblMedia.Visible := true;
+  lblMediaFinal.Visible := true;
+  lblResultado.Visible := true;
+  lblResultadoFinal.Visible := true;
+end;
+
+procedure TForm1.btnCalcularClick(Sender: TObject);
+begin
+  lblMediaFinal.Caption := ''; // Limpar a label antes de calcular, para não mostrar quando ocorrer um erro de digitação
+  lblResultadoFinal.Caption := '';
+
+  if ValidarNumero(nota1, nota2, nota3) then // Se a validação retornar true
+    begin
+      media := CalcularMedia(nota1, nota2, nota3);
+      Calcular(media);
+      lblMediaFinal.Caption := FloatToStrF(media, ffFixed, 3, 2); // Precision 3 para arredondar corretamente a casa decimal
+      LabelFinalVisivel;
+    end;
+end;
+
+end.
